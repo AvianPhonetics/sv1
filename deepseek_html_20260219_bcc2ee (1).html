@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Stroop Challenge: Цветной тест</title>
+    <!-- VK Bridge -->
+    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at 30% 20%, #2a1e4a, #0d0b1a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+        }
+
+        .game {
+            max-width: 700px;
+            width: 100%;
+            background: linear-gradient(145deg, #1e1b38, #15122e);
+            border-radius: 56px;
+            padding: 24px 20px;
+            box-shadow: 0 25px 0 #0a0820, 0 30px 40px rgba(0,0,0,0.7);
+            border: 2px solid #f6b83e;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game::before {
+            content: "";
+            position: absolute;
+            top: -30%;
+            left: -20%;
+            width: 140%;
+            height: 140%;
+            background: radial-gradient(circle, rgba(255,200,100,0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            background: #26224a;
+            border-radius: 60px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            border: 2px solid #f6b83e;
+            box-shadow: inset 0 -4px 0 #0f0d22;
+            position: relative;
+            z-index: 2;
+        }
+
+        .title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #ffe680;
+            text-shadow: 0 4px 0 #b87c2e, 0 0 15px #ffd966;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .title span {
+            font-size: 2.2rem;
+        }
+
+        .stats {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background: #12102a;
+            border-radius: 40px;
+            padding: 6px 18px;
+            color: #b7b0ff;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 2px solid #9f7aff;
+            box-shadow: inset 0 -3px 0 #0a0820;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .timer {
+            color: #ffb884;
+            border-color: #ffa55c;
+        }
+
+        .game-area {
+            background: #1d1940;
+            border-radius: 48px;
+            padding: 30px 15px;
+            margin: 20px 0;
+            border: 3px solid #f6b83e;
+            box-shadow: inset 0 -6px 0 #0f0d28, 0 15px 25px rgba(0,0,0,0.6);
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .target {
+            font-size: 7rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-shadow: 5px 5px 0 #00000060, 0 0 30px currentColor;
+            transition: color 0.2s, transform 0.1s;
+            line-height: 1.2;
+        }
+
+        .rule-hint {
+            background: #ffd966;
+            color: #1d1b3a;
+            display: inline-block;
+            padding: 8px 24px;
+            border-radius: 60px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 25px;
+            border: 2px solid #f39c12;
+            box-shadow: 0 5px 0 #b45f1a;
+        }
+
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .color-btn {
+            min-width: 110px;
+            padding: 18px 12px;
+            border-radius: 50px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            border: none;
+            box-shadow: 0 8px 0 #7a7a7a, 0 10px 20px black;
+            cursor: pointer;
+            transition: 0.07s;
+            color: white;
+            text-shadow: 2px 2px 0 black;
+            flex: 1 1 auto;
+            border: 2px solid white;
+        }
+
+        .color-btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #7a7a7a;
+        }
+
+        .color-btn.red { background: #e63946; }
+        .color-btn.green { background: #2a9d8f; }
+        .color-btn.blue { background: #3a86ff; }
+        .color-btn.yellow { background: #ffbe0b; color: #333; text-shadow: 2px 2px 0 white; }
+
+        .control-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin: 25px 0 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .btn {
+            background: #f6b83e;
+            border: none;
+            border-radius: 60px;
+            padding: 12px 28px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #1d2b3f;
+            box-shadow: 0 8px 0 #a56f28;
+            cursor: pointer;
+            transition: 0.07s;
+            border: 2px solid #ffe694;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 3px 0 #a56f28;
+        }
+
+        .btn.share {
+            background: #4a76a8;
+            box-shadow: 0 8px 0 #2e4a6a;
+            border-color: #8db2e0;
+            color: white;
+        }
+
+        .message {
+            color: #ffdcaa;
+            font-size: 1.4rem;
+            text-align: center;
+            margin: 10px 0 5px;
+            min-height: 2.8rem;
+            text-shadow: 0 2px 0 #5a3e1a;
+        }
+
+        .rating-box {
+            background: #2a2555;
+            border-radius: 60px;
+            padding: 12px 20px;
+            margin: 10px 0;
+            border: 2px solid #f6b83e;
+            box-shadow: inset 0 -3px 0 #12102a;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fde49b;
+        }
+
+        .best-score {
+            color: #ccbbff;
+            font-size: 1.3rem;
+            text-align: center;
+            margin: 5px 0;
+            background: #1e1b3a;
+            padding: 8px 20px;
+            border-radius: 60px;
+            display: inline-block;
+            border: 2px solid #b886ff;
+        }
+
+        footer {
+            text-align: center;
+            color: #9f8ac0;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="game">
+        <div class="header">
+            <div class="title"><span>🎯</span> Stroop Challenge</div>
+            <div class="stats">
+                <div class="stat-box timer" id="timer">⏱️ 1:00</div>
+                <div class="stat-box" id="score">🏆 0</div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="target" id="target">3</div>
+            <div class="rule-hint" id="ruleHint">Выбери цвет цифры</div>
+            <div class="options" id="options">
+                <button class="color-btn red" data-color="red">Красный</button>
+                <button class="color-btn green" data-color="green">Зелёный</button>
+                <button class="color-btn blue" data-color="blue">Синий</button>
+                <button class="color-btn yellow" data-color="yellow">Жёлтый</button>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <button class="btn" id="newGameBtn">🔄 Новая игра</button>
+            <button class="btn share" id="shareBtn">📢 Поделиться</button>
+        </div>
+
+        <div class="message" id="message">Жми на цвет, которым написана цифра!</div>
+        <div class="rating-box" id="rating">🌟🌟🌟</div>
+        <div class="best-score" id="bestScore">🏅 Лучший: 0</div>
+        <footer>⚡ Тренируй внимание и скорость реакции</footer>
+    </div>
+
+    <script>
+        (function() {
+            // VK Bridge
+            const vkBridge = window.vkBridge;
+            if (vkBridge) vkBridge.send('VKWebAppInit');
+
+            // Цвета и соответствующие CSS-классы
+            const colorMap = {
+                'красный': '#e63946',
+                'зелёный': '#2a9d8f',
+                'синий': '#3a86ff',
+                'жёлтый': '#ffbe0b'
+            };
+
+            const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+            const colorNames = ['красный', 'зелёный', 'синий', 'жёлтый'];
+
+            let currentNumber, currentDisplayColor;
+            let score = 0;
+            let timeLeft = 60;
+            let gameActive = false;
+            let timerInterval = null;
+            let bestScore = 0;
+
+            // Загрузка рекорда
+            try {
+                const saved = localStorage.getItem('stroopBest_v3');
+                if (saved) bestScore = parseInt(saved, 10);
+            } catch (e) {}
+            document.getElementById('bestScore').innerText = `🏅 Лучший: ${bestScore}`;
+
+            // --- Улучшенные звуки ---
+            let audioCtx = null;
+            function initAudio() {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            }
+
+            // Короткий вибро-звонок (правильно)
+            function playCorrect() {
+                try {
+                    initAudio();
+                    const now = audioCtx.currentTime;
+                    // Два быстрых тона
+                    for (let i = 0; i < 2; i++) {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.frequency.value = 800 + i * 200; // 800 и 1000 Гц
+                        gain.gain.setValueAtTime(0.15, now + i * 0.1);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.15);
+                        osc.start(now + i * 0.1);
+                        osc.stop(now + i * 0.1 + 0.15);
+                    }
+                    // Вибрация (если поддерживается)
+                    if (navigator.vibrate) navigator.vibrate(50);
+                } catch (e) {}
+            }
+
+            // Низкий "ба-дум" с тремоло (неправильно)
+            function playWrong() {
+                try {
+                    initAudio();
+                    const now = audioCtx.currentTime;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.frequency.value = 200;
+                    // добавляем тремоло (быстрая модуляция громкости)
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.setValueAtTime(0.2, now + 0.05);
+                    gain.gain.setValueAtTime(0.05, now + 0.1);
+                    gain.gain.setValueAtTime(0.2, now + 0.15);
+                    gain.gain.setValueAtTime(0.05, now + 0.2);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                    
+                    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                } catch (e) {}
+            }
+
+            // Грустная мелодия окончания (game over)
+            function playGameOver() {
+                try {
+                    initAudio();
+                    const now = audioCtx.currentTime;
+                    const notes = [400, 350, 300, 250];
+                    notes.forEach((freq, i) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.frequency.value = freq;
+                        gain.gain.setValueAtTime(0.15, now + i * 0.15);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.15 + 0.2);
+                        osc.start(now + i * 0.15);
+                        osc.stop(now + i * 0.15 + 0.2);
+                    });
+                    if (navigator.vibrate) navigator.vibrate(300);
+                } catch (e) {}
+            }
+
+            // Фанфары для рекорда
+            function playRecord() {
+                try {
+                    initAudio();
+                    const now = audioCtx.currentTime;
+                    const notes = [500, 600, 700, 800, 900];
+                    notes.forEach((freq, i) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.frequency.value = freq;
+                        gain.gain.setValueAtTime(0.2, now + i * 0.1);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.2);
+                        osc.start(now + i * 0.1);
+                        osc.stop(now + i * 0.1 + 0.2);
+                    });
+                    if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
+                } catch (e) {}
+            }
+
+            // --- Юмористическая градация ---
+            function getRating(score) {
+                if (score < 5) return "👶 Хомячок-соня — ты только проснулся?";
+                if (score < 10) return "🐢 Черепашка-неспешка — главное не скорость, а чтобы весело!";
+                if (score < 15) return "🐿️ Белка-неумека — орешки щёлкаешь, а с цветами туговато";
+                if (score < 20) return "🦊 Хитрый лис — уже неплохо, но можешь лучше!";
+                if (score < 25) return "🐺 Серый волк — в струопе кое-что сечёшь";
+                if (score < 30) return "🦅 Орёл — внимание острое, как клюв!";
+                if (score < 35) return "🦁 Лев — король внимания, но не тиран";
+                if (score < 40) return "🐉 Дракон — огонь в глазах, цвета не ускользнут!";
+                if (score < 45) return "⚡ Флэш — ты быстрее своих мыслей!";
+                return "🚀 Инопланетный гений — пришельцы гордятся тобой!";
+            }
+
+            // Генерация нового задания
+            function generateTask() {
+                currentNumber = numbers[Math.floor(Math.random() * numbers.length)];
+                currentDisplayColor = colorNames[Math.floor(Math.random() * colorNames.length)];
+                
+                const targetEl = document.getElementById('target');
+                targetEl.innerText = currentNumber;
+                targetEl.style.color = colorMap[currentDisplayColor];
+                
+                document.getElementById('ruleHint').innerText = 'Выбери цвет цифры';
+            }
+
+            function updateTimerDisplay() {
+                const mins = Math.floor(timeLeft / 60);
+                const secs = timeLeft % 60;
+                document.getElementById('timer').innerText = `⏱️ ${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            }
+
+            function startTimer() {
+                if (timerInterval) clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    if (!gameActive) return;
+                    timeLeft--;
+                    updateTimerDisplay();
+                    
+                    if (timeLeft <= 0) {
+                        timeLeft = 0;
+                        updateTimerDisplay();
+                        endGame(false); // время вышло
+                    }
+                }, 1000);
+            }
+
+            function endGame(isMistake) {
+                if (!gameActive) return;
+                gameActive = false;
+                clearInterval(timerInterval);
+                
+                let messageText = '';
+                if (isMistake) {
+                    playGameOver();
+                    messageText = '😵 Ошибка! Игра окончена.';
+                } else {
+                    messageText = '⏰ Время вышло!';
+                }
+                
+                // Проверка рекорда
+                let newRecord = false;
+                if (score > bestScore) {
+                    bestScore = score;
+                    localStorage.setItem('stroopBest_v3', bestScore);
+                    document.getElementById('bestScore').innerText = `🏅 Лучший: ${bestScore}`;
+                    newRecord = true;
+                    playRecord();
+                    messageText += ' 🎉 Новый рекорд!';
+                }
+                
+                document.getElementById('message').innerHTML = messageText;
+                
+                // Показываем юмористическую оценку
+                const ratingText = getRating(score);
+                document.getElementById('rating').innerHTML = `✨ Твой результат: ${score} очков — ${ratingText}`;
+            }
+
+            function newGame() {
+                if (timerInterval) clearInterval(timerInterval);
+                gameActive = true;
+                score = 0;
+                timeLeft = 60;
+                document.getElementById('score').innerText = `🏆 0`;
+                updateTimerDisplay();
+                generateTask();
+                startTimer();
+                document.getElementById('message').innerHTML = 'Жми на цвет, которым написана цифра!';
+                document.getElementById('rating').innerHTML = '🌟🌟🌟';
+            }
+
+            // Обработка ответа
+            function onColorClick(color) {
+                if (!gameActive) return;
+                
+                const colorRussian = {
+                    'red': 'красный',
+                    'green': 'зелёный',
+                    'blue': 'синий',
+                    'yellow': 'жёлтый'
+                }[color];
+                
+                if (colorRussian === currentDisplayColor) {
+                    playCorrect();
+                    score++;
+                    document.getElementById('score').innerText = `🏆 ${score}`;
+                    generateTask();
+                } else {
+                    playWrong();
+                    endGame(true);
+                }
+            }
+
+            // Кнопки цветов
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    onColorClick(btn.dataset.color);
+                });
+            });
+
+            document.getElementById('newGameBtn').addEventListener('click', newGame);
+
+            document.getElementById('shareBtn').addEventListener('click', () => {
+                if (!vkBridge) {
+                    alert('Поделиться можно только внутри VK');
+                    return;
+                }
+                const ratingText = getRating(score);
+                const text = `Я набрал ${score} очков в Stroop Challenge! ${ratingText} ⚡ Тренируй внимание и скорость. А ты сможешь больше? #StroopChallenge #игры #внимание`;
+                vkBridge.send('VKWebAppShare', { message: text })
+                    .then(() => document.getElementById('message').innerText = 'Спасибо, что поделился!')
+                    .catch(() => document.getElementById('message').innerText = 'Не удалось поделиться');
+            });
+
+            // Активация аудио при первом клике
+            document.addEventListener('click', function initAudioOnce() {
+                initAudio();
+            }, { once: true });
+
+            // Старт
+            newGame();
+        })();
+    </script>
+</body>
+</html>
