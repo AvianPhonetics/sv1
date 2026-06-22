@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Синтетические диалоги поддержки – Купить датасет</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f0 100%);
+      color: #1e293b;
+      line-height: 1.6;
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 60px 20px; }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+    .hero .highlight { color: #4f46e5; }
+    .hero p {
+      font-size: 1.25rem;
+      color: #475569;
+      max-width: 700px;
+      margin: 0 auto 30px;
+      font-weight: 400;
+    }
+    .badge {
+      display: inline-block;
+      background: #4f46e5;
+      color: white;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+
+    /* Тарифы */
+    .pricing {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+    .card {
+      background: white;
+      border-radius: 24px;
+      padding: 40px 30px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-align: center;
+      border: 1px solid rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(79, 70, 229, 0.1);
+    }
+    .card.popular {
+      border: 2px solid #4f46e5;
+      position: relative;
+    }
+    .card.popular::before {
+      content: "ПОПУЛЯРНЫЙ";
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #4f46e5;
+      color: white;
+      padding: 4px 18px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .card h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #1e293b;
+    }
+    .card .price {
+      font-size: 3.2rem;
+      font-weight: 700;
+      color: #4f46e5;
+      margin: 20px 0 10px;
+    }
+    .card .period {
+      font-size: 1rem;
+      color: #64748b;
+      margin-bottom: 25px;
+    }
+    .card ul {
+      list-style: none;
+      text-align: left;
+      margin-bottom: 30px;
+      flex-grow: 1;
+    }
+    .card ul li {
+      padding: 10px 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.95rem;
+      color: #334155;
+      display: flex;
+      align-items: center;
+    }
+    .card ul li::before {
+      content: "✓";
+      color: #4f46e5;
+      font-weight: bold;
+      margin-right: 10px;
+      font-size: 1.1rem;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: #4f46e5;
+      color: white;
+      text-decoration: none;
+      border-radius: 14px;
+      font-weight: 600;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-align: center;
+    }
+    .btn:hover { background: #4338ca; }
+    .btn.outline {
+      background: transparent;
+      border: 2px solid #4f46e5;
+      color: #4f46e5;
+    }
+    .btn.outline:hover {
+      background: #f8fafc;
+    }
+
+    /* Блок доверия */
+    .trust {
+      text-align: center;
+      margin: 60px 0 40px;
+      padding: 30px;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.05);
+    }
+    .trust h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+    }
+    .trust-grid {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+    }
+    .trust-item img {
+      width: 40px;
+      opacity: 0.8;
+    }
+    .payment-methods {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 30px 0;
+    }
+    .payment-methods span {
+      background: #f1f5f9;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+
+    /* Подвал */
+    footer {
+      text-align: center;
+      color: #94a3b8;
+      margin-top: 50px;
+      font-size: 0.85rem;
+    }
+    footer a { color: #4f46e5; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="badge">ГОТОВЫЙ NLP-ДАТАСЕТ</div>
+      <h1>Синтетические <span class="highlight">диалоги поддержки</span> на русском</h1>
+      <p>200+ размеченных диалогов для обучения чат-ботов и классификаторов обращений. Строго по 152-ФЗ, без персональных данных. Идеально для ритейла, банков, телекома.</p>
+    </div>
+
+    <!-- Тарифы -->
+    <div class="pricing">
+      <!-- Базовый -->
+      <div class="card">
+        <h3>Базовая</h3>
+        <div class="price">1 990 ₽</div>
+        <div class="period">единоразово</div>
+        <ul>
+          <li>Готовый датасет (200 диалогов)</li>
+          <li>Форматы JSONL + CSV</li>
+          <li>Datasheet с описанием</li>
+          <li>Лицензия для коммерческого использования</li>
+        </ul>
+        <!-- Ссылка на оплату: замените YOUR_LOGIN и SignatureValue на свои -->
+        <a href="https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=YOUR_LOGIN&OutSum=1990&Description=BasicDataset&SignatureValue=PLACEHOLDER_SIG" class="btn">Купить</a>
+      </div>
+
+      <!-- Расширенный (популярный) -->
+      <div class="card popular">
+        <h3>Расширенная ⭐</h3>
+        <div class="price">4 990 ₽</div>
+        <div class="period">единоразово</div>
+        <ul>
+          <li>Всё из базовой версии</li>
+          <li>Генератор неограниченного числа диалогов (Python + HTML)</li>
+          <li>Возможность настройки тем, тональности, срочности</li>
+          <li>Экспорт в JSONL/CSV в один клик</li>
+          <li>Примеры кода для обучения</li>
+        </ul>
+        <a href="https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=YOUR_LOGIN&OutSum=4990&Description=ExtendedDataset&SignatureValue=PLACEHOLDER_SIG2" class="btn">Купить</a>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="card">
+        <h3>Enterprise</h3>
+        <div class="price">29 900 ₽</div>
+        <div class="period">по запросу</div>
+        <ul>
+          <li>Эксклюзивная лицензия</li>
+          <li>Кастомизация под ваш бизнес</li>
+          <li>Приоритетная поддержка</li>
+          <li>Интеграция в ваши пайплайны</li>
+        </ul>
+        <a href="mailto:your@email.ru" class="btn outline">Связаться</a>
+      </div>
+    </div>
+
+    <!-- Доверие и оплата -->
+    <div class="trust">
+      <h2>🔒 Безопасная оплата</h2>
+      <div class="payment-methods">
+        <span>💳 Банковские карты</span>
+        <span>🏦 СБП</span>
+        <span>📱 Apple / Google Pay</span>
+      </div>
+      <p style="margin-top:15px; color:#475569;">
+        Мгновенная доставка на email после оплаты. Платёж обрабатывает <strong>Robokassa</strong>.
+      </p>
+      <div class="trust-grid" style="margin-top:30px;">
+        <div class="trust-item">
+          <span style="font-size:1.8rem;">🔒</span> SSL-шифрование
+        </div>
+        <div class="trust-item">
+          <span style="font-size:1.8rem;">📄</span> Самозанятый (чеки)
+        </div>
+        <div class="trust-item">
+          <span style="font-size:1.8rem;">⚡</span> Мгновенная доставка
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      © 2025 Synthetic Data Lab | <a href="#">Лицензия CDLA-Permissive 2.0</a>
+    </footer>
+  </div>
+</body>
+</html>
